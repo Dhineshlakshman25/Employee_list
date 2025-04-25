@@ -1,42 +1,242 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: "Roboto", sans-serif;
+  margin: 20px;
+  background: #fff;
+  color: #222;
+}
+h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+button.add-employee {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead tr {
+  background-color: #f8f9fa;
+}
+thead th {
+  text-align: left;
+  font-weight: 700;
+  padding: 8px 10px;
+  border: 1px solid #dee2e6;
+}
+tbody tr:nth-child(odd) {
+  background-color: #f8f9fa;
+}
+tbody td {
+  padding: 8px 10px;
+  border: 1px solid #dee2e6;
+  vertical-align: middle;
+}
+tbody td.actions {
+  white-space: nowrap;
+}
+button.update {
+  background-color: #17a2b8;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+button.delete {
+  background-color: #dc3545;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+button.view {
+  background-color: #17a2b8;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+@media (max-width: 600px) {
+  body {
+    margin: 10px;
+  }
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block;
+  }
+  thead tr {
+    display: none;
+  }
+  tbody tr {
+    margin-bottom: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f8f9fa;
+  }
+  tbody td {
+    border: none;
+    padding: 6px 0;
+    position: relative;
+    padding-left: 50%;
+    font-size: 14px;
+  }
+  tbody td.actions {
+    padding-left: 0;
+    white-space: normal;
+  }
+  tbody td::before {
+    position: absolute;
+    top: 6px;
+    left: 10px;
+    width: 45%;
+    white-space: nowrap;
+    font-weight: 700;
+    font-size: 13px;
+    color: #333;
+  }
+  tbody td:nth-of-type(1)::before {
+    content: "Employee First Name";
+  }
+  tbody td:nth-of-type(2)::before {
+    content: "Employee Last Name";
+  }
+  tbody td:nth-of-type(3)::before {
+    content: "Employee Email Id";
+  }
+  tbody td:nth-of-type(4)::before {
+    content: "Actions";
+  }
+  button.add-employee {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  button.update,
+  button.delete,
+  button.view {
+    margin: 5px 5px 5px 0;
+    width: auto;
+    font-size: 14px;
+    padding: 7px 12px;
+  }
+}
+
+/* Overlay styles */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.overlay.active {
+  display: flex;
+}
+.modal {
+  background: white;
+  border-radius: 6px;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px 25px 25px 25px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+.modal h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-weight: 500;
+  font-size: 20px;
   text-align: center;
 }
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.modal .data {
+  display: flex;
+  flex-direction: column;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.modal label {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 5px;
+  margin-top: 12px;
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.modal input[type="text"],
+.modal input[type="email"] {
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
 }
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.modal .buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.modal button {
+  padding: 7px 14px;
+  font-size: 14px;
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
 }
-
-.card {
-  padding: 2em;
+.modal button.submit {
+  background-color: #007bff;
+  color: white;
 }
-
-.read-the-docs {
-  color: #888;
+.modal button.delete {
+  background-color: #dc3545;
+  color: white;
+}
+.modal button.cancel {
+  background-color: #6c757d;
+  color: white;
+}
+/* View modal content */
+.view-content {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.view-content p {
+  margin: 8px 0;
+}
+.error {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.6rem;
+}
+.delete-message {
+  margin: 1rem 0;
+  font-size: 1rem;
+  text-align: center;
+}
+.buttons-center {
+  justify-content: center;
 }
