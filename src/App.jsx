@@ -1,4 +1,9 @@
 import React, { useState } from "react";
+import EmployeeTable from "./components/EmployeeTable";
+import AddEmployeeModal from "./components/AddEmployeeModal";
+import UpdateEmployeeModal from "./components/UpdateEmployeeModal";
+import ViewEmployeeModal from "./components/ViewEmployeeModal";
+import DeleteEmployeeModal from "./components/DeleteEmployeeModal";
 import "./App.css";
 
 function App() {
@@ -6,20 +11,22 @@ function App() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [currentEmployee, setCurrentEmployee] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const [currentEmployee, setCurrentEmployee] = useState(null);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
-  const [updateFormData, setUpdateFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-  });
+
   const [addFormData, setAddFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
   });
   const [addFormErrors, setAddFormErrors] = useState({});
+  const [updateFormData, setUpdateFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+  });
 
   const validateForm = () => {
     const errors = {};
@@ -68,257 +75,59 @@ function App() {
       <button className="add-employee" onClick={() => setShowAddModal(true)}>
         Add Employee
       </button>
-      <table>
-        <thead>
-          <tr>
-            <th>Employee First Name</th>
-            <th>Employee Last Name</th>
-            <th>Employee Email Id</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {employees.length === 0 ? (
-            <tr>
-              <td colSpan="4" style={{ textAlign: "center" }}>
-                No employees yet.
-              </td>
-            </tr>
-          ) : (
-            employees.map((emp, index) => (
-              <tr key={index}>
-                <td>{emp.firstName}</td>
-                <td>{emp.lastName}</td>
-                <td>{emp.email}</td>
-                <td className="actions">
-                  <button
-                    className="update"
-                    onClick={() => {
-                      setCurrentEmployee(emp);
-                      setUpdateFormData(emp); // ✅ populate form fields
-                      setShowUpdateModal(true);
-                    }}
-                  >
-                    Update
-                  </button>
-                  <button
-                    className="delete"
-                    onClick={() => {
-                      setEmployeeToDelete(emp);
-                      setShowDeleteModal(true);
-                    }}
-                  >
-                    Delete
-                  </button>
-                  <button
-                    className="view"
-                    onClick={() => {
-                      setCurrentEmployee(emp);
-                      setShowViewModal(true);
-                    }}
-                  >
-                    View
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
 
-      {/* Delete Modal */}
-      {showDeleteModal && (
-        <div
-          className="overlay active"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setShowDeleteModal(false)}
-        >
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Delete Employee</h3>
-            <p className="delete-message">
-              Are you sure you want to delete this employee?
-            </p>
-            <div className="buttons buttons-center">
-              <button
-                type="button"
-                className="cancel"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancel
-              </button>
-              <button type="button" className="delete" onClick={handleDelete}>
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EmployeeTable
+        employees={employees}
+        onView={(emp) => {
+          setCurrentEmployee(emp);
+          setShowViewModal(true);
+        }}
+        onUpdate={(emp) => {
+          setCurrentEmployee(emp);
+          setUpdateFormData(emp);
+          setShowUpdateModal(true);
+        }}
+        onDelete={(emp) => {
+          setEmployeeToDelete(emp);
+          setShowDeleteModal(true);
+        }}
+      />
 
-      {/* Add Modal */}
       {showAddModal && (
-        <div className="overlay active" onClick={() => setShowAddModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Add Employee</h3>
-            <div className="data">
-              <>
-                <label>First Name</label>
-                <input
-                  type="text"
-                  value={addFormData.firstName}
-                  onChange={(e) =>
-                    setAddFormData({
-                      ...addFormData,
-                      firstName: e.target.value,
-                    })
-                  }
-                />
-                {addFormErrors.firstName && (
-                  <p className="error">{addFormErrors.firstName}</p>
-                )}
-
-                <label>Last Name</label>
-                <input
-                  type="text"
-                  value={addFormData.lastName}
-                  onChange={(e) =>
-                    setAddFormData({ ...addFormData, lastName: e.target.value })
-                  }
-                />
-                {addFormErrors.lastName && (
-                  <p className="error">{addFormErrors.lastName}</p>
-                )}
-
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={addFormData.email}
-                  onChange={(e) =>
-                    setAddFormData({ ...addFormData, email: e.target.value })
-                  }
-                />
-                {addFormErrors.email && (
-                  <p className="error">{addFormErrors.email}</p>
-                )}
-
-                <div className="buttons">
-                  <button
-                    type="button"
-                    className="cancel"
-                    onClick={() => {
-                      setShowAddModal(false);
-                      setAddFormErrors({});
-                      setAddFormData({
-                        firstName: "",
-                        lastName: "",
-                        email: "",
-                      });
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button type="button" className="submit" onClick={handleAdd}>
-                    Add
-                  </button>
-                </div>
-              </>
-            </div>
-          </div>
-        </div>
+        <AddEmployeeModal
+          formData={addFormData}
+          setFormData={setAddFormData}
+          errors={addFormErrors}
+          onClose={() => {
+            setShowAddModal(false);
+            setAddFormErrors({});
+            setAddFormData({ firstName: "", lastName: "", email: "" });
+          }}
+          onSubmit={handleAdd}
+        />
       )}
 
-      {/* Update Modal */}
       {showUpdateModal && currentEmployee && (
-        <div
-          className="overlay active"
-          onClick={() => setShowUpdateModal(false)}
-        >
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Update Employee</h3>
-            <div className="data">
-              <>
-                <label>First Name</label>
-                <input
-                  type="text"
-                  value={updateFormData.firstName}
-                  onChange={(e) =>
-                    setUpdateFormData({
-                      ...updateFormData,
-                      firstName: e.target.value,
-                    })
-                  }
-                />
-                <label>Last Name</label>
-                <input
-                  type="text"
-                  value={updateFormData.lastName}
-                  onChange={(e) =>
-                    setUpdateFormData({
-                      ...updateFormData,
-                      lastName: e.target.value,
-                    })
-                  }
-                />
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={updateFormData.email}
-                  onChange={(e) =>
-                    setUpdateFormData({
-                      ...updateFormData,
-                      email: e.target.value,
-                    })
-                  }
-                />
-                <div className="buttons">
-                  <button
-                    type="button"
-                    className="cancel"
-                    onClick={() => setShowUpdateModal(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="submit"
-                    onClick={handleUpdate}
-                  >
-                    Update
-                  </button>
-                </div>
-              </>
-            </div>
-          </div>
-        </div>
+        <UpdateEmployeeModal
+          formData={updateFormData}
+          setFormData={setUpdateFormData}
+          onClose={() => setShowUpdateModal(false)}
+          onSubmit={handleUpdate}
+        />
       )}
 
-      {/* View Modal */}
       {showViewModal && currentEmployee && (
-        <div className="overlay active" onClick={() => setShowViewModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>View Employee</h3>
-            <div className="view-content">
-              <p>
-                <strong>First Name:</strong> {currentEmployee.firstName}
-              </p>
-              <p>
-                <strong>Last Name:</strong> {currentEmployee.lastName}
-              </p>
-              <p>
-                <strong>Email:</strong> {currentEmployee.email}
-              </p>
-            </div>
-            <div className="buttons" style={{ justifyContent: "center" }}>
-              <button
-                type="button"
-                className="cancel"
-                onClick={() => setShowViewModal(false)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
+        <ViewEmployeeModal
+          employee={currentEmployee}
+          onClose={() => setShowViewModal(false)}
+        />
+      )}
+
+      {showDeleteModal && (
+        <DeleteEmployeeModal
+          onConfirm={handleDelete}
+          onCancel={() => setShowDeleteModal(false)}
+        />
       )}
     </div>
   );
